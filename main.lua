@@ -51,6 +51,7 @@ background[2].speed = 25
 local car = display.newImage("moto.png", 412.5, 1100)
 physics.addBody( car, "dynamic", { density = .1, bounce=0.0, friction=0.3 } )
 car.type = "main"
+car.alive = true
 
 --POSICOES DOS NOVOS SPAWNS
 local positionX = {}
@@ -60,41 +61,32 @@ positionX[3] = 412.5
 positionX[4] = 537.5
 
 local positionY = {}
-positionY[1] = -200
-positionY[2] = -400
-positionY[3] = -600
-positionY[4] = -800
-positionY[5] = -1000
+for i=1,20,1 do
+	positionY[i] = -i*100
+end
+
 
 --OBSTACULOS
 
 local car1 = {
 obstaclecar = "obstaclecar1.png", 
-x = positionX[math.random(1, 4)],
-y = -2*math.random(200,800),
 speed = math.random(8, 12),
 objectType = "enemy"
 }
 
 local car2 = {
 obstaclecar = "obstaclecar2.png", 
-x = positionX[math.random(1, 4)],
-y = -2*math.random(200,800),
 speed = math.random(9, 13),
 objectType = "enemy",
 }
 
 local car3 = {
 obstaclecar = "obstaclecar3.png",
-x = positionX[math.random(1, 4)],
-y = -2*math.random(200,800),
 speed = math.random(10, 14),
 objectType = "enemy"
 }
 local car4 = {
 obstaclecar = "obstaclecar4.png", 
-x = positionX[math.random(1,4)],
-y = -2*math.random(200,800),
 speed = math.random(11, 15),
 objectType = "enemy"
 }
@@ -105,9 +97,11 @@ obstacleCarList[2] = car2
 obstacleCarList[3] = car3
 obstacleCarList[4] = car4
 
+
+
 local crate = display.newImage("crate.png", 537.5, -1100)
 crate.speed = math.random(19, 22)
-physics.addBody( crate, "dynamic", { density = .1, bounce=0.0, friction=0.3 } )
+physics.addBody( crate, "static", { density = .1, bounce=0.0, friction=0.3 } )
 crate.type = "enemy"
 
 --SCORE
@@ -215,6 +209,7 @@ function onCollision(event)
     local type2 = event.object2.type
     	if (type1 == "main" and type2 == "enemy") then
 		print("you lost")
+			car.alive = false
 			car:removeSelf()
 			
 			crate:removeSelf()
@@ -241,41 +236,103 @@ function onCollision(event)
 
 end
 
-function spawnCar (param)
+function spawnCar (param, x, y)
 
-local newObstacleCar = display.newImage(param.obstaclecar, param.x, param.y)
+local newObstacleCar = display.newImage(param.obstaclecar, x, y)
 newObstacleCar.speed = param.speed
 newObstacleCar.type = param.objectType
+newObstacleCar.isFixedRotation = true
 physics.addBody( newObstacleCar, "dynamic", { density=.1, bounce=0.0, friction=0.3 } )
 newObstacleCar.enterFrame = parallaxScrollObstacleCar
 Runtime:addEventListener("enterFrame", newObstacleCar)
+print("A new car was spawned. The y is: " , newObstacleCar.y)
+print("A new car was spawned. The x is: " , newObstacleCar.x)
+
 end
 
 function parallaxScrollObstacleCar(self, event)
-	if self.y > 1500 then
+	if self.y > 1450 then
 		
-		--[[
-		self.y = positionY[math.random(1,5)]
-		obstacleposition = math.random(1,4)
-		self.speed = math.random(14, 16)
-		self.x = positionX[math.random(1,4)]
-		]]--
-
 		self:removeSelf()
 		Runtime:removeEventListener("enterFrame", self)
-		spawnCar(obstacleCarList[math.random(1,4)])
-		
+				
 	else
 	self.y = self.y + self.speed
+		
 	-- body
 	end
 end
 
-function startGame()
-for i=1, 4, 1 do
-timer.performWithDelay(400, spawnCar(obstacleCarList[math.random(1,4)]), 1)
+function spawnCarSet(param)
+	if param == 1 then
+		print("Caso: ", param)
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[5])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[4])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[2])
+	end
+	if param == 2 then
+		print("Caso: ", param)
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[5])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[5])
+	end
+	if param == 3 then
+		print("Caso: ", param)
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[7])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[3])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[6])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[7])
+	end
+	if param == 4 then
+		print("Caso: ", param)
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[6])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[4])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[7])
+	end
+	if param == 5 then
+		print("Caso: ", param)
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[6])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[4])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[7])
+	end
+	if param == 6 then
+		print("Caso: ", param)
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[6])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[4])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[7])
+	end
+	if param == 7 then
+		print("Caso: ", param)
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[6])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[4])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[7])
+	end
+	if param == 8 then
+		print("Caso: ", param)
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[1], positionY[6])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[1])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[2], positionY[4])
+	spawnCar(obstacleCarList[math.random(1,4)], positionX[3], positionY[7])
+	end
+	
 end
-
+function startGame()
+print("this is from start game")
+spawnCarSet(math.random(1,8))
 end
 
 --EVENTOS
@@ -298,14 +355,9 @@ Runtime:addEventListener("enterFrame", background[4])
 background[6].enterFrame = parallaxScroll3
 Runtime:addEventListener("enterFrame", background[6])
 
---EVENTOS OBSTACULOS
-
-crate.enterFrame = parallaxScrollObstacleFixed
-Runtime:addEventListener("enterFrame", crate)
 
 Runtime:addEventListener("touch", swipe)
 
 Runtime:addEventListener("collision", onCollision)
 
 startGame()
-
